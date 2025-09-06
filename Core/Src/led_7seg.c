@@ -9,6 +9,9 @@
 #define SEG_ON 0
 #define SEG_OFF 1
 
+#define LED_ON 0
+#define LED_OFF 1
+
 void display7SEG(int num) {
     const uint8_t lut[10] = {
 		0x3F, // 0: a b c d e f
@@ -33,3 +36,4 @@ void display7SEG(int num) {
 	HAL_GPIO_WritePin(SEG5_GPIO_Port, SEG5_Pin, (m & (0x01 << 5)) ? SEG_ON : SEG_OFF); // f
 	HAL_GPIO_WritePin(SEG6_GPIO_Port, SEG6_Pin, (m & (0x01 << 6)) ? SEG_ON : SEG_OFF); // g
 }
+
