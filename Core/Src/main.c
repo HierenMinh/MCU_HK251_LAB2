@@ -21,11 +21,10 @@
 #include "main.h"
 #include "tim.h"
 #include "gpio.h"
-#include "led_7seg.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "led_7seg.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -142,27 +141,52 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-int counter = 0;
-int status = 2;
+int counter_seg = 0;
+int counter_dot = 0;
+int status = 0;
 void init() {
 	HAL_GPIO_WritePin(EN0_GPIO_Port, EN0_Pin, LED_OFF);
 	HAL_GPIO_WritePin(EN1_GPIO_Port, EN1_Pin, LED_OFF);
+	HAL_GPIO_WritePin(EN1_GPIO_Port, EN2_Pin, LED_OFF);
+	HAL_GPIO_WritePin(EN1_GPIO_Port, EN3_Pin, LED_OFF);
 }
 void HAL_TIM_PeriodElapsedCallback ( TIM_HandleTypeDef * htim ) {
-	counter++;
-	if(counter >= 50) {
+	counter_dot++;
+	counter_seg++;
+	if(counter_dot >= 100) {
+		HAL_GPIO_TogglePin(DOT_GPIO_Port, DOT_Pin);
+		counter_dot = 0;
+	}
+	if(counter_seg >= 50) {
+		counter_seg = 0;
 		switch (status) {
 		case 1:
+		    status = 2;
 			HAL_GPIO_WritePin(EN0_GPIO_Port, EN0_Pin, LED_OFF);
 			HAL_GPIO_WritePin(EN1_GPIO_Port, EN1_Pin, LED_ON);
-		    status = 2;
-		    counter = 0;
+			HAL_GPIO_WritePin(EN0_GPIO_Port, EN2_Pin, LED_OFF);
+			HAL_GPIO_WritePin(EN0_GPIO_Port, EN3_Pin, LED_OFF);
 		    break;
 		case 2:
+			status = 3;
+			HAL_GPIO_WritePin(EN0_GPIO_Port, EN0_Pin, LED_OFF);
+			HAL_GPIO_WritePin(EN1_GPIO_Port, EN1_Pin, LED_OFF);
+			HAL_GPIO_WritePin(EN0_GPIO_Port, EN2_Pin, LED_ON);
+			HAL_GPIO_WritePin(EN0_GPIO_Port, EN3_Pin, LED_OFF);
+			break;
+		case 3:
+			status = 0;
+			HAL_GPIO_WritePin(EN0_GPIO_Port, EN0_Pin, LED_OFF);
+			HAL_GPIO_WritePin(EN1_GPIO_Port, EN1_Pin, LED_OFF);
+			HAL_GPIO_WritePin(EN0_GPIO_Port, EN2_Pin, LED_OFF);
+			HAL_GPIO_WritePin(EN0_GPIO_Port, EN3_Pin, LED_ON);
+			break;
+		case 0:
+			status = 1;
 			HAL_GPIO_WritePin(EN0_GPIO_Port, EN0_Pin, LED_ON);
 			HAL_GPIO_WritePin(EN1_GPIO_Port, EN1_Pin, LED_OFF);
-			status = 1;
-			counter = 0;
+			HAL_GPIO_WritePin(EN0_GPIO_Port, EN2_Pin, LED_OFF);
+			HAL_GPIO_WritePin(EN0_GPIO_Port, EN3_Pin, LED_OFF);
 			break;
 		default:
 			break;
